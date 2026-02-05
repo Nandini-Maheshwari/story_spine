@@ -1,11 +1,13 @@
 const GOOGLE_BOOKS_API = "https://www.googleapis.com/books/v1/volumes"
 
 export async function fetchGoogleBookById(googleBookId: string) {
-  const res = await fetch(`${GOOGLE_BOOKS_API}/${googleBookId}`)
+  const res = await fetch(
+    `${GOOGLE_BOOKS_API}/${googleBookId}?key=${process.env.GOOGLE_BOOKS_API_KEY}`
+  )
+
   if (!res.ok) throw new Error("Failed to fetch Google Book")
 
   const json = await res.json()
-
   const v = json.volumeInfo
 
   return {
