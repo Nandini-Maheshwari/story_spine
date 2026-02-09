@@ -1,22 +1,15 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server"
+import { rateBook } from "@/lib/services/ratings"
 
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerClient()
-
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     return Response.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const {
-    googleBookId,
-    overall,
-    character,
-    pacing,
-    storyline,
-    writing,
-    spicy,
-  } = await req.json()
+  const body = await req.json()
+  const { googleBookId, overall } = body
 
   if (!googleBookId || overall == null) {
     return Response.json(
@@ -25,17 +18,6 @@ export async function POST(req: Request) {
     )
   }
 
-  const { error } = await supabase.rpc("rate_book_by_google_id", {
-    p_google_book_id: googleBookId,
-    p_overall: overall,
-    p_character: character ?? null,
-    p_pacing: pacing ?? null,
-    p_storyline: storyline ?? null,
-    p_writing: writing ?? null,
-    p_spicy: spicy ?? null,
-  })
-
-  if (error) throw error
-
+  await rateBook(googleBookId, body)
   return Response.json({ success: true })
 }

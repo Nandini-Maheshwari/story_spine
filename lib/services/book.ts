@@ -1,8 +1,8 @@
 import { supabase } from "@/lib/supabase"
 
-// ─────────────────────────────────────────────
-// Internal (StorySpine ID based) — keep these
-// ─────────────────────────────────────────────
+// ────────────────────────────────
+// Internal (StorySpine ID based)
+// ────────────────────────────────
 
 export async function getBookPage(bookId: number) {
   const { data, error } = await supabase.rpc("get_book_page", {
@@ -38,9 +38,9 @@ export async function getUserBookStatus(bookId: number) {
   return data?.[0]
 }
 
-// ─────────────────────────────────────────────
-// Public (Google Book ID based) — what API uses
-// ─────────────────────────────────────────────
+// ─────────────────────────────────
+// Public (Google Book ID based) 
+// ─────────────────────────────────
 
 export async function getBookPageByGoogleId(googleBookId: string) {
   const { data, error } = await supabase.rpc("get_book_page_by_google_id", {
