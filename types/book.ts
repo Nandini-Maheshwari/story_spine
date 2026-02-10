@@ -38,6 +38,18 @@ export interface UserBookStatus {
   finished_at: string | null;
 }
 
+export interface LibraryBook {
+  id: number;
+  title: string;
+  cover_url: string | null;
+  status: string;
+  progress_percent: number | null;
+  note: string | null;
+  started_at: string | null;
+  finished_at: string | null;
+  genres: string[];
+}
+
 export interface BookPageResponse {
   source: "google" | "storyspine";
   book: Book;
