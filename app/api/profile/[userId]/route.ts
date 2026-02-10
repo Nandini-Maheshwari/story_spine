@@ -2,8 +2,9 @@ import { getUserProfilePage } from "@/lib/services/profile"
 
 export async function GET(
   req: Request,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
-  const data = await getUserProfilePage(params.userId)
+  const { userId } = await params
+  const data = await getUserProfilePage(userId)
   return Response.json(data)
 }
