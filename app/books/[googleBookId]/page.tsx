@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { BookPageResponse } from "@/types/book";
 import BookHeader from "@/components/BookHeader";
+import LibraryActions from "@/components/LibraryActions";
 import RatingsSummary from "@/components/RatingsSummary";
+import RatingForm from "@/components/RatingForm";
 import BookSummary from "@/components/BookSummary";
 import ReviewsList from "@/components/ReviewsList";
 
@@ -45,15 +47,23 @@ export async function generateMetadata({
 export default async function BookPage({ params }: BookPageProps) {
   const { googleBookId } = await params;
   const data = await getBookData(googleBookId);
-  const { source, book, reviews, readingCount } = data;
+  const { source, book, reviews, readingCount, userStatus } = data;
 
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
       <div className="space-y-8">
         <BookHeader book={book} />
+        <LibraryActions googleBookId={googleBookId} userStatus={userStatus} />
         <RatingsSummary book={book} source={source} readingCount={readingCount} />
+        {userStatus?.status === "read" && (
+          <RatingForm googleBookId={googleBookId} />
+        )}
         <BookSummary summary={book.summary} />
-        <ReviewsList reviews={reviews} googleBookId={googleBookId} />
+        <ReviewsList
+          reviews={reviews}
+          googleBookId={googleBookId}
+          userStatus={userStatus}
+        />
       </div>
     </div>
   );

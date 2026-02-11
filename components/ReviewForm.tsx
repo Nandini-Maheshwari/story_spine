@@ -14,20 +14,9 @@ export default function ReviewForm({ googleBookId }: ReviewFormProps) {
   const [content, setContent] = useState("");
   const [spoiler, setSpoiler] = useState(false);
   const [status, setStatus] = useState<
-    "idle" | "submitting" | "success" | "error" | "unauthorized"
+    "idle" | "submitting" | "success" | "error"
   >("idle");
   const [errorMessage, setErrorMessage] = useState("");
-
-  if (status === "unauthorized") {
-    return (
-      <p className="text-sm text-muted">
-        <a href="/login" className="text-accent hover:underline">
-          Log in
-        </a>{" "}
-        to write a review.
-      </p>
-    );
-  }
 
   if (!open) {
     return (
@@ -54,11 +43,6 @@ export default function ReviewForm({ googleBookId }: ReviewFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ googleBookId, content: content.trim(), spoiler }),
       });
-
-      if (res.status === 401) {
-        setStatus("unauthorized");
-        return;
-      }
 
       if (!res.ok) {
         const data = await res.json();

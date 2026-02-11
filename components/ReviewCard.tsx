@@ -1,4 +1,7 @@
-import { Heart, AlertTriangle } from "lucide-react";
+"use client";
+
+import { AlertTriangle } from "lucide-react";
+import LikeButton from "@/components/LikeButton";
 import type { Review } from "@/types/book";
 
 interface ReviewCardProps {
@@ -43,10 +46,13 @@ export default function ReviewCard({ review }: ReviewCardProps) {
         )}
       </p>
 
-      {review.like_count > 0 && !isDeleted && (
-        <div className="flex items-center gap-1 mt-3 text-xs text-muted">
-          <Heart className="w-3.5 h-3.5" />
-          <span>{review.like_count}</span>
+      {!isDeleted && (
+        <div className="mt-3">
+          <LikeButton
+            reviewId={review.id}
+            likeCount={review.like_count}
+            isLiked={review.is_liked}
+          />
         </div>
       )}
     </article>

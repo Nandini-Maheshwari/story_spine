@@ -22,6 +22,7 @@ export interface Review {
   content: string;
   spoiler: boolean;
   like_count: number;
+  is_liked: boolean;
   created_at: string;
   user_id: string;
   username: string;
