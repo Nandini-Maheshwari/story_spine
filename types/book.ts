@@ -29,6 +29,13 @@ export interface Review {
   display_name: string | null;
   avatar_url: string | null;
   deleted_at: string | null;
+  is_own_review: boolean;
+  user_overall: number | null;
+  user_character: number | null;
+  user_pacing: number | null;
+  user_storyline: number | null;
+  user_writing: number | null;
+  user_spicy: number | null;
 }
 
 export interface UserBookStatus {

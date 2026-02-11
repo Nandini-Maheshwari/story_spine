@@ -23,9 +23,16 @@ export default function ReviewCard({ review }: ReviewCardProps) {
   return (
     <article className="py-5 border-b border-border last:border-b-0">
       <div className="flex items-center justify-between mb-2">
-        <span className="text-sm font-medium text-foreground">
-          {displayName}
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-foreground">
+            {displayName}
+          </span>
+          {review.is_own_review && (
+            <span className="px-1.5 py-0.5 text-xs font-medium text-accent bg-accent/10 rounded">
+              Your review
+            </span>
+          )}
+        </div>
         <span className="text-xs text-muted">{formattedDate}</span>
       </div>
 

@@ -4,8 +4,18 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Star } from "lucide-react";
 
+export interface ExistingRatings {
+  overall: number;
+  character: number | null;
+  pacing: number | null;
+  storyline: number | null;
+  writing: number | null;
+  spicy: number | null;
+}
+
 interface RatingFormProps {
   googleBookId: string;
+  existingRatings?: ExistingRatings | null;
 }
 
 const DIMENSIONS = [
@@ -38,16 +48,16 @@ function StarRow({
     <div className="flex items-center gap-3">
       <span className="text-sm text-muted w-24 shrink-0">
         {label}
-        {required && <span className="text-red-400 ml-0.5">*</span>}
+        {required && !disabled && <span className="text-red-400 ml-0.5">*</span>}
       </span>
-      <div className="flex gap-0.5" onMouseLeave={() => setHover(0)}>
+      <div className="flex gap-0.5" onMouseLeave={() => !disabled && setHover(0)}>
         {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
             type="button"
             disabled={disabled}
             onClick={() => onChange(star)}
-            onMouseEnter={() => setHover(star)}
+            onMouseEnter={() => !disabled && setHover(star)}
             className="p-0.5 disabled:cursor-default"
           >
             <Star
@@ -67,7 +77,7 @@ function StarRow({
   );
 }
 
-export default function RatingForm({ googleBookId }: RatingFormProps) {
+export default function RatingForm({ googleBookId, existingRatings }: RatingFormProps) {
   const router = useRouter();
   const [ratings, setRatings] = useState<Record<DimensionKey, number>>({
     overall: 0,
@@ -131,6 +141,30 @@ export default function RatingForm({ googleBookId }: RatingFormProps) {
         err instanceof Error ? err.message : "Something went wrong"
       );
     }
+  }
+
+  if (existingRatings) {
+    return (
+      <section className="py-4 border-t border-border">
+        <h2 className="text-lg font-semibold mb-4">Your rating</h2>
+        <div className="space-y-3">
+          {DIMENSIONS.map((dim) => {
+            const value = existingRatings[dim.key];
+            if (value === null || value === undefined || value === 0) return null;
+            return (
+              <StarRow
+                key={dim.key}
+                label={dim.label}
+                value={value}
+                required={dim.required}
+                onChange={() => {}}
+                disabled={true}
+              />
+            );
+          })}
+        </div>
+      </section>
+    );
   }
 
   if (status === "unauthorized") {

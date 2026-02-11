@@ -6,14 +6,16 @@ interface ReviewsListProps {
   reviews: Review[];
   googleBookId: string;
   userStatus: UserBookStatus | null;
+  hasOwnReview: boolean;
 }
 
 export default function ReviewsList({
   reviews,
   googleBookId,
   userStatus,
+  hasOwnReview,
 }: ReviewsListProps) {
-  const canReview = userStatus?.status === "read";
+  const canReview = userStatus?.status === "read" && !hasOwnReview;
 
   if (reviews.length === 0) {
     return (
