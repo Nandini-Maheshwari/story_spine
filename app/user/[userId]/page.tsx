@@ -65,6 +65,7 @@ function BookShelf({ title, books }: { title: string; books: Book[] }) {
                 width={120}
                 height={180}
                 className="rounded-md shadow-sm border border-border"
+                unoptimized
               />
             ) : (
               <div className="w-[120px] h-[180px] rounded-md border border-border bg-gray-50 flex items-center justify-center">

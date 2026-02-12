@@ -27,6 +27,7 @@ export default function LibraryBookCard({ book }: { book: LibraryBook }) {
           width={80}
           height={120}
           className="rounded shrink-0 border border-border object-cover"
+          unoptimized
         />
       ) : (
         <div className="w-[80px] h-[120px] rounded shrink-0 bg-gray-100 border border-border" />

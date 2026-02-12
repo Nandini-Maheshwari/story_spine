@@ -16,7 +16,7 @@ export default function BookHeader({ book }: BookHeaderProps) {
             width={180}
             height={270}
             className="rounded-md shadow-sm border border-border"
-            priority
+            unoptimized
           />
         </div>
       )}
