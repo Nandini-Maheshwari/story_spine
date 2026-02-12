@@ -9,8 +9,8 @@ export async function GET() {
   } = await supabase.auth.getUser()
 
   const books = user
-    ? await getPersonalizedFeed()
-    : await getTrendingBooks()
+    ? await getPersonalizedFeed(supabase)
+    : await getTrendingBooks(supabase)
 
   return Response.json(books)
 }

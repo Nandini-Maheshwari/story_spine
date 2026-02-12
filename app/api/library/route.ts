@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   const limit = Number(searchParams.get("limit") || 20)
   const offset = Number(searchParams.get("offset") || 0)
 
-  const data = await getUserLibrary(status, year, genre, limit, offset)
+  const data = await getUserLibrary(supabase, status, year, genre, limit, offset)
   return Response.json(data)
 }
 
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     )
   }
 
-  const bookId = await addBookToLibrary(googleBookId, status)
+  const bookId = await addBookToLibrary(supabase, googleBookId, status)
 
   return Response.json({
     success: true,
@@ -62,7 +62,7 @@ export async function PATCH(req: Request) {
     )
   }
 
-  await updateLibraryStatus(googleBookId, status, progress)
+  await updateLibraryStatus(supabase, googleBookId, status, progress)
 
   return Response.json({ success: true })
 }

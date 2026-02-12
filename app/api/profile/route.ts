@@ -10,7 +10,7 @@ export async function PATCH(req: Request) {
   }
 
   const body = await req.json()
-  await updateUserProfile(body)
+  await updateUserProfile(supabase, body)
 
   return Response.json({ success: true })
 }

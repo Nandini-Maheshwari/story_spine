@@ -14,6 +14,6 @@ export async function POST(req: Request) {
     return Response.json({ message: "Invalid genres" }, { status: 400 })
   }
 
-  await updateUserGenres(genreIds)
+  await updateUserGenres(supabase, genreIds)
   return Response.json({ success: true })
 }

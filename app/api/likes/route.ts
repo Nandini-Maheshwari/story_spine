@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     return Response.json({ message: "Missing targetId" }, { status: 400 })
   }
 
-  await likeReview(targetId)
+  await likeReview(supabase, targetId)
   return Response.json({ success: true })
 }
 
@@ -25,6 +25,6 @@ export async function DELETE(req: Request) {
     return Response.json({ message: "Missing targetId" }, { status: 400 })
   }
 
-  await unlikeReview(targetId)
+  await unlikeReview(supabase, targetId)
   return Response.json({ success: true })
 }
