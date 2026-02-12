@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Star } from "lucide-react";
 
 export interface ExistingRatings {
@@ -171,9 +172,9 @@ export default function RatingForm({ googleBookId, existingRatings }: RatingForm
     return (
       <section className="py-4">
         <p className="text-sm text-muted">
-          <a href="/login" className="text-accent hover:underline">
+          <Link href="/login" className="text-accent hover:underline">
             Log in
-          </a>{" "}
+          </Link>{" "}
           to rate this book.
         </p>
       </section>

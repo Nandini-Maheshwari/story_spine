@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 
 interface LikeButtonProps {
@@ -14,6 +15,7 @@ export default function LikeButton({
   likeCount,
   isLiked,
 }: LikeButtonProps) {
+  const router = useRouter();
   const [liked, setLiked] = useState(isLiked);
   const [count, setCount] = useState(likeCount);
   const [pending, setPending] = useState(false);
@@ -36,8 +38,14 @@ export default function LikeButton({
         body: JSON.stringify({ targetId: reviewId }),
       });
 
+      if (res.status === 401) {
+        setLiked(wasLiked);
+        setCount(prevCount);
+        router.push("/login");
+        return;
+      }
+
       if (!res.ok) {
-        // Revert on failure
         setLiked(wasLiked);
         setCount(prevCount);
       }

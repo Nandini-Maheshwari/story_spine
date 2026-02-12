@@ -41,7 +41,7 @@ export default function SignupPage() {
       return;
     }
 
-    router.push("/library");
+    window.location.href = "/library";
   }
 
   return (

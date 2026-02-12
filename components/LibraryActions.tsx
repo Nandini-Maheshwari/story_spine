@@ -2,24 +2,10 @@
 
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { BookPlus, BookOpen, CheckCircle, RotateCcw, Play } from "lucide-react";
 import type { UserBookStatus } from "@/types/book";
-
-const STATUS_STYLES: Record<string, string> = {
-  tbr: "bg-gray-50 text-gray-700",
-  reading: "bg-blue-50 text-blue-700",
-  read: "bg-green-50 text-green-700",
-  paused: "bg-amber-50 text-amber-700",
-  abandoned: "bg-red-50 text-red-700",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  tbr: "TBR",
-  reading: "Reading",
-  read: "Read",
-  paused: "Paused",
-  abandoned: "Abandoned",
-};
+import { STATUS_STYLES, STATUS_LABELS } from "@/lib/constants";
 
 interface LibraryActionsProps {
   googleBookId: string;
@@ -103,9 +89,9 @@ export default function LibraryActions({
     return (
       <section className="py-3">
         <p className="text-sm text-muted">
-          <a href="/login" className="text-accent hover:underline">
+          <Link href="/login" className="text-accent hover:underline">
             Log in
-          </a>{" "}
+          </Link>{" "}
           to add books to your library.
         </p>
       </section>

@@ -29,7 +29,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/library");
+    window.location.href = "/library";
   }
 
   return (
