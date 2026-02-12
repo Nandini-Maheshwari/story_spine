@@ -1,25 +1,14 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { LibraryBook } from "@/types/book";
-
-const STATUS_STYLES: Record<string, string> = {
-  tbr: "bg-gray-50 text-gray-700",
-  reading: "bg-blue-50 text-blue-700",
-  read: "bg-green-50 text-green-700",
-  paused: "bg-amber-50 text-amber-700",
-  abandoned: "bg-red-50 text-red-700",
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  tbr: "TBR",
-  reading: "Reading",
-  read: "Read",
-  paused: "Paused",
-  abandoned: "Abandoned",
-};
+import { STATUS_STYLES, STATUS_LABELS } from "@/lib/constants";
 
 export default function LibraryBookCard({ book }: { book: LibraryBook }) {
   return (
-    <div className="flex gap-4 border border-border rounded-md p-4 hover:shadow-sm transition-shadow">
+    <Link
+      href={`/books/${book.google_book_id}`}
+      className="flex gap-4 border border-border rounded-md p-4 hover:shadow-sm transition-shadow"
+    >
       {book.cover_url ? (
         <Image
           src={book.cover_url}
@@ -60,6 +49,6 @@ export default function LibraryBookCard({ book }: { book: LibraryBook }) {
           <p className="text-sm text-muted line-clamp-2">{book.note}</p>
         )}
       </div>
-    </div>
+    </Link>
   );
 }

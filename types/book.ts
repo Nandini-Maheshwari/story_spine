@@ -48,6 +48,7 @@ export interface UserBookStatus {
 
 export interface LibraryBook {
   id: number;
+  google_book_id: string;
   title: string;
   cover_url: string | null;
   status: string;

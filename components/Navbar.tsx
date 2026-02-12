@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { BookOpen, User, LogIn } from "lucide-react";
+import { BookOpen, Library, User, LogIn } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
+import LogoutButton from "@/components/LogoutButton";
 
 export default async function Navbar() {
   const supabase = await createSupabaseServerClient();
@@ -23,13 +24,23 @@ export default async function Navbar() {
 
         <div className="flex items-center gap-4">
           {user ? (
-            <Link
-              href="/profile"
-              className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors"
-            >
-              <User className="w-4 h-4" />
-              <span>Profile</span>
-            </Link>
+            <>
+              <Link
+                href="/library"
+                className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors"
+              >
+                <Library className="w-4 h-4" />
+                <span>Library</span>
+              </Link>
+              <Link
+                href={`/user/${user.id}`}
+                className="flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors"
+              >
+                <User className="w-4 h-4" />
+                <span>Profile</span>
+              </Link>
+              <LogoutButton />
+            </>
           ) : (
             <Link
               href="/login"
