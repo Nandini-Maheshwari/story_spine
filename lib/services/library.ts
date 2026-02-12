@@ -1,7 +1,8 @@
-import { supabase } from "@/lib/supabase"
+import type { SupabaseClient } from "@supabase/supabase-js"
 import { fetchGoogleBookById } from "@/lib/google"
 
 export async function getUserLibrary(
+  supabase: SupabaseClient,
   status?: string,
   year?: number,
   genre?: string,
@@ -20,6 +21,7 @@ export async function getUserLibrary(
 }
 
 export async function addBookToLibrary(
+  supabase: SupabaseClient,
   googleBookId: string,
   status: string
 ) {
@@ -42,6 +44,7 @@ export async function addBookToLibrary(
 }
 
 export async function updateLibraryStatus(
+  supabase: SupabaseClient,
   googleBookId: string,
   status: string,
   progress?: number

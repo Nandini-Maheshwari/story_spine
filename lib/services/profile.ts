@@ -1,6 +1,6 @@
-import { supabase } from "@/lib/supabase"
+import type { SupabaseClient } from "@supabase/supabase-js"
 
-export async function getUserProfilePage(userId: string) {
+export async function getUserProfilePage(supabase: SupabaseClient, userId: string) {
   const [
     profile,
     genres,
@@ -15,13 +15,16 @@ export async function getUserProfilePage(userId: string) {
     supabase.rpc("get_user_recent_reviews", { p_user_id: userId }),
   ])
 
-  if (
-    profile.error ||
-    genres.error ||
-    currentlyReading.error ||
-    recentlyFinished.error ||
-    recentReviews.error
-  ) {
+  const errors = {
+    profile: profile.error?.message,
+    genres: genres.error?.message,
+    currentlyReading: currentlyReading.error?.message,
+    recentlyFinished: recentlyFinished.error?.message,
+    recentReviews: recentReviews.error?.message,
+  }
+
+  if (Object.values(errors).some(Boolean)) {
+    console.error("[getUserProfilePage] RPC errors:", errors)
     throw new Error("Failed to load profile")
   }
 
@@ -35,6 +38,7 @@ export async function getUserProfilePage(userId: string) {
 }
 
 export async function updateUserProfile(
+  supabase: SupabaseClient,
   fields: {
     displayName?: string
     bio?: string
