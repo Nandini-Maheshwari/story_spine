@@ -1,9 +1,11 @@
-import { cookies } from "next/headers";
 import type { Metadata } from "next";
 import type { LibraryBook } from "@/types/book";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { getUserLibrary } from "@/lib/services/library";
 import LibraryFilters from "@/components/LibraryFilters";
 import LibraryBookCard from "@/components/LibraryBookCard";
 import Link from "next/link";
+import { BookOpen } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Your Library | StorySpine",
@@ -21,34 +23,23 @@ interface LibraryPageProps {
   }>;
 }
 
-async function getLibrary(
-  params: { status?: string; genre?: string; year?: string; offset?: string },
-  cookieHeader: string
-): Promise<LibraryBook[]> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const url = new URL("/api/library", baseUrl);
-
-  if (params.status) url.searchParams.set("status", params.status);
-  if (params.genre) url.searchParams.set("genre", params.genre);
-  if (params.year) url.searchParams.set("year", params.year);
-  url.searchParams.set("limit", String(PAGE_SIZE));
-  url.searchParams.set("offset", params.offset || "0");
-
-  const res = await fetch(url.toString(), {
-    cache: "no-store",
-    headers: { Cookie: cookieHeader },
-  });
-
-  if (!res.ok) return [];
-  return res.json();
-}
-
 export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const params = await searchParams;
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
+  const supabase = await createSupabaseServerClient();
 
-  const books = await getLibrary(params, cookieHeader);
+  let books: LibraryBook[] = [];
+  try {
+    books = await getUserLibrary(
+      supabase,
+      params.status,
+      params.year ? Number(params.year) : undefined,
+      params.genre,
+      PAGE_SIZE,
+      Number(params.offset || 0)
+    );
+  } catch {
+    // Unauthorized or error — show empty
+  }
 
   const offset = Number(params.offset || 0);
   const hasNext = books.length === PAGE_SIZE;
@@ -95,10 +86,24 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
               <LibraryBookCard key={book.id} book={book} />
             ))}
           </div>
+        ) : params.status || params.genre || params.year ? (
+          <div className="text-center py-12">
+            <p className="text-sm text-muted">No books match your filters.</p>
+            <Link
+              href="/library"
+              className="text-sm text-accent hover:underline mt-2 inline-block"
+            >
+              Clear filters
+            </Link>
+          </div>
         ) : (
-          <p className="text-sm text-muted py-12 text-center">
-            No books found.
-          </p>
+          <div className="text-center py-16">
+            <BookOpen className="w-10 h-10 text-muted mx-auto mb-3" />
+            <p className="text-sm text-muted">Your library is empty.</p>
+            <p className="text-sm text-muted mt-1">
+              Search for books to start building your collection.
+            </p>
+          </div>
         )}
 
         {/* Pagination */}

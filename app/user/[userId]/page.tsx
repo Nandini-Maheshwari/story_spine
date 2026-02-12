@@ -4,26 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { User, Heart, BookOpen } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
-import type { UserProfileResponse } from "@/types/profile";
+import { getUserProfilePage } from "@/lib/services/profile";
 import type { Book } from "@/types/book";
+import type { UserProfileResponse } from "@/types/profile";
 import EditProfileForm from "@/components/EditProfileForm";
 
 interface UserPageProps {
   params: Promise<{ userId: string }>;
-}
-
-async function getProfileData(userId: string): Promise<UserProfileResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/profile/${userId}`, {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    if (res.status === 404) notFound();
-    throw new Error(`Failed to fetch profile: ${res.status}`);
-  }
-
-  return res.json();
 }
 
 export async function generateMetadata({
@@ -32,7 +19,8 @@ export async function generateMetadata({
   const { userId } = await params;
 
   try {
-    const { profile } = await getProfileData(userId);
+    const supabase = await createSupabaseServerClient();
+    const { profile } = await getUserProfilePage(supabase, userId);
     const name = profile.display_name || profile.username;
     return {
       title: `${name} | StorySpine`,
@@ -45,8 +33,26 @@ export async function generateMetadata({
   }
 }
 
-function BookShelf({ title, books }: { title: string; books: Book[] }) {
-  if (books.length === 0) return null;
+function BookShelf({
+  title,
+  books,
+  isOwnProfile,
+  emptyMessage,
+}: {
+  title: string;
+  books: Book[];
+  isOwnProfile: boolean;
+  emptyMessage: string;
+}) {
+  if (books.length === 0) {
+    if (!isOwnProfile) return null;
+    return (
+      <section>
+        <h2 className="text-lg font-semibold mb-3">{title}</h2>
+        <p className="text-sm text-muted">{emptyMessage}</p>
+      </section>
+    );
+  }
 
   return (
     <section>
@@ -84,11 +90,14 @@ function BookShelf({ title, books }: { title: string; books: Book[] }) {
 
 export default async function UserPage({ params }: UserPageProps) {
   const { userId } = await params;
-  const data = await getProfileData(userId);
-  const { profile, genres, currentlyReading, recentlyFinished, recentReviews } = data;
-
   const supabase = await createSupabaseServerClient();
+
   const { data: { user } } = await supabase.auth.getUser();
+
+  const data = await getUserProfilePage(supabase, userId) as UserProfileResponse;
+  if (!data?.profile) notFound();
+
+  const { profile, genres, currentlyReading, recentlyFinished, recentReviews } = data;
   const isOwnProfile = user?.id === profile.id;
 
   return (
@@ -146,11 +155,11 @@ export default async function UserPage({ params }: UserPageProps) {
         )}
 
         {/* Favorite Genres */}
-        {genres.length > 0 && (
+        {genres.length > 0 ? (
           <section>
             <h2 className="text-lg font-semibold mb-3">Favorite Genres</h2>
             <div className="flex flex-wrap gap-2">
-              {genres.map((genre) => (
+              {genres.map((genre: string) => (
                 <span
                   key={genre}
                   className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-muted border border-border"
@@ -160,16 +169,33 @@ export default async function UserPage({ params }: UserPageProps) {
               ))}
             </div>
           </section>
-        )}
+        ) : isOwnProfile ? (
+          <section>
+            <h2 className="text-lg font-semibold mb-3">Favorite Genres</h2>
+            <p className="text-sm text-muted">
+              Your favorite genres will appear as you rate books.
+            </p>
+          </section>
+        ) : null}
 
         {/* Currently Reading */}
-        <BookShelf title="Currently Reading" books={currentlyReading} />
+        <BookShelf
+          title="Currently Reading"
+          books={currentlyReading}
+          isOwnProfile={isOwnProfile}
+          emptyMessage="Start reading a book to see it here."
+        />
 
         {/* Recently Finished */}
-        <BookShelf title="Recently Finished" books={recentlyFinished} />
+        <BookShelf
+          title="Recently Finished"
+          books={recentlyFinished}
+          isOwnProfile={isOwnProfile}
+          emptyMessage="Books you finish will appear here."
+        />
 
         {/* Recent Reviews */}
-        {recentReviews.length > 0 && (
+        {recentReviews.length > 0 ? (
           <section>
             <h2 className="text-lg font-semibold mb-3">Recent Reviews</h2>
             <div>
@@ -207,7 +233,14 @@ export default async function UserPage({ params }: UserPageProps) {
               })}
             </div>
           </section>
-        )}
+        ) : isOwnProfile ? (
+          <section>
+            <h2 className="text-lg font-semibold mb-3">Recent Reviews</h2>
+            <p className="text-sm text-muted">
+              Your reviews will appear here once you start sharing your thoughts.
+            </p>
+          </section>
+        ) : null}
       </div>
     </div>
   );

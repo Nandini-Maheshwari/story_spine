@@ -1,6 +1,14 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import type { BookPageResponse } from "@/types/book";
+import { createSupabaseServerClient } from "@/lib/supabase-server";
+import {
+  getBookPageByGoogleId,
+  getBookReviewsByGoogleId,
+  getBookReadingCountByGoogleId,
+  getUserBookStatusByGoogleId,
+} from "@/lib/services/book";
+import { fetchGoogleBookById } from "@/lib/google";
 import BookHeader from "@/components/BookHeader";
 import LibraryActions from "@/components/LibraryActions";
 import RatingsSummary from "@/components/RatingsSummary";
@@ -13,17 +21,43 @@ interface BookPageProps {
 }
 
 async function getBookData(googleBookId: string): Promise<BookPageResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/books/${googleBookId}`, {
-    cache: "no-store",
-  });
+  const supabase = await createSupabaseServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-  if (!res.ok) {
-    if (res.status === 404) notFound();
-    throw new Error(`Failed to fetch book data: ${res.status}`);
+  const book = await getBookPageByGoogleId(supabase, googleBookId);
+
+  if (!book) {
+    const googleBook = await fetchGoogleBookById(googleBookId);
+    return {
+      source: "google",
+      book: {
+        ...googleBook,
+        ss_avg_overall: null,
+        ss_avg_character: null,
+        ss_avg_pacing: null,
+        ss_avg_storyline: null,
+        ss_avg_writing: null,
+        ss_rating_count: null,
+      },
+      reviews: [],
+      readingCount: 0,
+      userStatus: null,
+    };
   }
 
-  return res.json();
+  const [reviews, readingCount, userStatus] = await Promise.all([
+    getBookReviewsByGoogleId(supabase, googleBookId, 10, 0),
+    getBookReadingCountByGoogleId(supabase, googleBookId),
+    user ? getUserBookStatusByGoogleId(supabase, googleBookId) : null,
+  ]);
+
+  return {
+    source: "storyspine",
+    book,
+    reviews,
+    readingCount,
+    userStatus,
+  };
 }
 
 export async function generateMetadata({
