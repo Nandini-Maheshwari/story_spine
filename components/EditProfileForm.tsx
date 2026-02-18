@@ -1,19 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil } from "lucide-react";
+
+interface Genre {
+  id: number;
+  name: string;
+}
 
 interface EditProfileFormProps {
   displayName: string | null;
   bio: string | null;
   avatarUrl: string | null;
+  currentGenreNames: string[];
 }
 
 export default function EditProfileForm({
   displayName,
   bio,
   avatarUrl,
+  currentGenreNames,
 }: EditProfileFormProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -27,6 +34,30 @@ export default function EditProfileForm({
   >("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [allGenres, setAllGenres] = useState<Genre[]>([]);
+  const [selectedGenreIds, setSelectedGenreIds] = useState<Set<number>>(new Set());
+  const [genresLoaded, setGenresLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!open || genresLoaded) return;
+
+    fetch("/api/preferences")
+      .then((res) => res.json())
+      .then((genres: Genre[]) => {
+        setAllGenres(genres);
+        const preSelected = new Set(
+          genres
+            .filter((g) => currentGenreNames.includes(g.name))
+            .map((g) => g.id)
+        );
+        setSelectedGenreIds(preSelected);
+        setGenresLoaded(true);
+      })
+      .catch(() => {
+        // Silently fail — genres section just won't show
+      });
+  }, [open, genresLoaded, currentGenreNames]);
+
   if (!open) {
     return (
       <button
@@ -39,31 +70,57 @@ export default function EditProfileForm({
     );
   }
 
+  function toggleGenre(id: number) {
+    setSelectedGenreIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("submitting");
     setErrorMessage("");
 
     try {
-      const res = await fetch("/api/profile", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          displayName: fields.displayName.trim() || null,
-          bio: fields.bio.trim() || null,
-          avatarUrl: fields.avatarUrl.trim() || null,
+      const [profileRes, genresRes] = await Promise.all([
+        fetch("/api/profile", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            displayName: fields.displayName.trim() || null,
+            bio: fields.bio.trim() || null,
+            avatarUrl: fields.avatarUrl.trim() || null,
+          }),
         }),
-      });
+        fetch("/api/preferences", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            genreIds: Array.from(selectedGenreIds),
+          }),
+        }),
+      ]);
 
-      if (res.status === 401) {
+      if (profileRes.status === 401 || genresRes.status === 401) {
         setErrorMessage("You must be logged in to edit your profile.");
         setStatus("error");
         return;
       }
 
-      if (!res.ok) {
-        const data = await res.json();
+      if (!profileRes.ok) {
+        const data = await profileRes.json();
         throw new Error(data.message || "Failed to update profile");
+      }
+
+      if (!genresRes.ok) {
+        const data = await genresRes.json();
+        throw new Error(data.message || "Failed to update genres");
       }
 
       setOpen(false);
@@ -121,6 +178,34 @@ export default function EditProfileForm({
         />
       </div>
 
+      {/* Genre Preferences */}
+      {allGenres.length > 0 && (
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-foreground">
+            Favorite genres
+          </label>
+          <div className="flex flex-wrap gap-2">
+            {allGenres.map((genre) => {
+              const selected = selectedGenreIds.has(genre.id);
+              return (
+                <button
+                  key={genre.id}
+                  type="button"
+                  onClick={() => toggleGenre(genre.id)}
+                  className={`px-3 py-1 text-xs rounded-full border transition-colors ${
+                    selected
+                      ? "bg-accent text-white border-accent"
+                      : "border-border text-muted hover:text-foreground hover:border-foreground/30"
+                  }`}
+                >
+                  {genre.name}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {status === "error" && (
         <p className="text-sm text-red-600">{errorMessage}</p>
       )}
@@ -144,6 +229,7 @@ export default function EditProfileForm({
               bio: bio ?? "",
               avatarUrl: avatarUrl ?? "",
             });
+            setGenresLoaded(false);
           }}
           className="text-sm text-muted hover:text-foreground transition-colors"
         >

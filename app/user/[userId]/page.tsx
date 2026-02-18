@@ -151,6 +151,7 @@ export default async function UserPage({ params }: UserPageProps) {
             displayName={profile.display_name}
             bio={profile.bio}
             avatarUrl={profile.avatar_url}
+            currentGenreNames={genres.map((g: { name: string }) => g.name)}
           />
         )}
 
@@ -159,12 +160,9 @@ export default async function UserPage({ params }: UserPageProps) {
           <section>
             <h2 className="text-lg font-semibold mb-3">Favorite Genres</h2>
             <div className="flex flex-wrap gap-2">
-              {genres.map((genre: string) => (
-                <span
-                  key={genre}
-                  className="px-2.5 py-0.5 text-xs font-medium rounded-full bg-gray-100 text-muted border border-border"
-                >
-                  {genre}
+              {genres.map((genre: { name: string }) => (
+                <span key={genre.name}>
+                  {genre.name}
                 </span>
               ))}
             </div>

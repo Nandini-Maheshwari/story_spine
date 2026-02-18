@@ -1,5 +1,11 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server"
-import { updateUserGenres } from "@/lib/services/preferences"
+import { getAllGenres, updateUserGenres } from "@/lib/services/preferences"
+
+export async function GET() {
+  const supabase = await createSupabaseServerClient()
+  const genres = await getAllGenres(supabase)
+  return Response.json(genres)
+}
 
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerClient()
