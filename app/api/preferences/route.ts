@@ -1,5 +1,11 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server"
-import { updateUserGenres } from "@/lib/services/preferences"
+import { getAllGenres, updateUserGenres } from "@/lib/services/preferences"
+
+export async function GET() {
+  const supabase = await createSupabaseServerClient()
+  const genres = await getAllGenres(supabase)
+  return Response.json(genres)
+}
 
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerClient()
@@ -14,6 +20,6 @@ export async function POST(req: Request) {
     return Response.json({ message: "Invalid genres" }, { status: 400 })
   }
 
-  await updateUserGenres(genreIds)
+  await updateUserGenres(supabase, genreIds)
   return Response.json({ success: true })
 }

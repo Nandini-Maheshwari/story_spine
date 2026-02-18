@@ -18,6 +18,6 @@ export async function POST(req: Request) {
     )
   }
 
-  await rateBook(googleBookId, body)
+  await rateBook(supabase, googleBookId, body)
   return Response.json({ success: true })
 }

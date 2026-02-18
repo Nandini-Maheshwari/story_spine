@@ -19,7 +19,7 @@ export async function GET(
   } = await supabase.auth.getUser()
 
   // Try StorySpine DB
-  const book = await getBookPageByGoogleId(googleBookId)
+  const book = await getBookPageByGoogleId(supabase, googleBookId)
 
   // If not found → fallback to Google
   if (!book) {
@@ -36,9 +36,9 @@ export async function GET(
 
   // Fetch StorySpine social data
   const [reviews, readingCount, userStatus] = await Promise.all([
-    getBookReviewsByGoogleId(googleBookId, 10, 0),
-    getBookReadingCountByGoogleId(googleBookId),
-    user ? getUserBookStatusByGoogleId(googleBookId) : null,
+    getBookReviewsByGoogleId(supabase, googleBookId, 10, 0),
+    getBookReadingCountByGoogleId(supabase, googleBookId),
+    user ? getUserBookStatusByGoogleId(supabase, googleBookId) : null,
   ])
 
   return Response.json({

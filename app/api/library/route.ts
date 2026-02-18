@@ -1,5 +1,24 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server"
-import { addBookToLibrary, updateLibraryStatus } from "@/lib/services/library"
+import { getUserLibrary, addBookToLibrary, updateLibraryStatus } from "@/lib/services/library"
+
+export async function GET(req: Request) {
+  const supabase = await createSupabaseServerClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return Response.json({ message: "Unauthorized" }, { status: 401 })
+  }
+
+  const { searchParams } = new URL(req.url)
+  const status = searchParams.get("status") || undefined
+  const year = searchParams.get("year") ? Number(searchParams.get("year")) : undefined
+  const genre = searchParams.get("genre") || undefined
+  const limit = Number(searchParams.get("limit") || 20)
+  const offset = Number(searchParams.get("offset") || 0)
+
+  const data = await getUserLibrary(supabase, status, year, genre, limit, offset)
+  return Response.json(data)
+}
 
 export async function POST(req: Request) {
   const supabase = await createSupabaseServerClient()
@@ -17,7 +36,7 @@ export async function POST(req: Request) {
     )
   }
 
-  const bookId = await addBookToLibrary(googleBookId, status)
+  const bookId = await addBookToLibrary(supabase, googleBookId, status)
 
   return Response.json({
     success: true,
@@ -43,7 +62,7 @@ export async function PATCH(req: Request) {
     )
   }
 
-  await updateLibraryStatus(googleBookId, status, progress)
+  await updateLibraryStatus(supabase, googleBookId, status, progress)
 
   return Response.json({ success: true })
 }

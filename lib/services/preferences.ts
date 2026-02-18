@@ -1,6 +1,12 @@
-import { supabase } from "@/lib/supabase"
+import type { SupabaseClient } from "@supabase/supabase-js"
 
-export async function updateUserGenres(genreIds: number[]) {
+export async function getAllGenres(supabase: SupabaseClient) {
+  const { data, error } = await supabase.rpc("get_all_genres")
+  if (error) throw error
+  return data as { id: number; name: string }[]
+}
+
+export async function updateUserGenres(supabase: SupabaseClient, genreIds: number[]) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error("Unauthorized")
 

@@ -1,6 +1,7 @@
-import { supabase } from "@/lib/supabase"
+import type { SupabaseClient } from "@supabase/supabase-js"
 
 export async function upsertReview(
+  supabase: SupabaseClient,
   googleBookId: string,
   content: string,
   spoiler: boolean

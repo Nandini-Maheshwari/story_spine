@@ -1,6 +1,7 @@
-import { supabase } from "@/lib/supabase"
+import type { SupabaseClient } from "@supabase/supabase-js"
 
 export async function rateBook(
+  supabase: SupabaseClient,
   googleBookId: string,
   ratings: {
     overall: number

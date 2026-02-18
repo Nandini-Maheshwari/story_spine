@@ -1,15 +1,10 @@
-import { getTrendingBooks } from "@/lib/services/home"
+import HomeContent from "@/components/HomeContent"
+import DiscoveryFeed from "@/components/DiscoveryFeed"
 
-export default async function Home() {
-  const books = await getTrendingBooks()
-
+export default function Home() {
   return (
-    <div className="p-8">
-      <h1 className="text-xl font-bold mb-4">Trending Books</h1>
-
-      <pre className="bg-gray-900 text-green-400 p-4 rounded">
-        {JSON.stringify(books, null, 2)}
-      </pre>
-    </div>
+    <HomeContent>
+      <DiscoveryFeed />
+    </HomeContent>
   )
 }

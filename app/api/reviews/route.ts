@@ -17,6 +17,6 @@ export async function POST(req: Request) {
     )
   }
 
-  await upsertReview(googleBookId, content, spoiler ?? false)
+  await upsertReview(supabase, googleBookId, content, spoiler ?? false)
   return Response.json({ success: true })
 }
