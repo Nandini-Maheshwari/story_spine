@@ -24,7 +24,7 @@ export interface ProfileReview {
 
 export interface UserProfileResponse {
   profile: UserProfile;
-  genres: string[];
+  genres: { name: string }[];
   currentlyReading: Book[];
   recentlyFinished: Book[];
   recentReviews: ProfileReview[];

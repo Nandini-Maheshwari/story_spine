@@ -7,7 +7,7 @@ const STATUS_TABS = [
   { value: "tbr", label: "TBR" },
   { value: "reading", label: "Reading" },
   { value: "read", label: "Read" },
-  { value: "paused", label: "Paused" },
+  // { value: "paused", label: "Paused" },
   { value: "abandoned", label: "Abandoned" },
 ];
 
