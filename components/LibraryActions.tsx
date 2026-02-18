@@ -3,7 +3,7 @@
 import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { BookPlus, BookOpen, CheckCircle, RotateCcw, Play } from "lucide-react";
+import { BookPlus, BookOpen, CheckCircle, RotateCcw, Play, XCircle } from "lucide-react";
 import type { UserBookStatus } from "@/types/book";
 import { STATUS_STYLES, STATUS_LABELS } from "@/lib/constants";
 
@@ -155,18 +155,36 @@ export default function LibraryActions({
             <CheckCircle className="w-4 h-4" />
             {submitting ? "Updating..." : "Mark as Read"}
           </button>
+          <button
+            onClick={() => handleStatusChange("abandoned")}
+            disabled={submitting}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-muted hover:text-red-600 transition-colors disabled:opacity-50"
+          >
+            <XCircle className="w-4 h-4" />
+            Abandon
+          </button>
         </>
       )}
 
       {status === "paused" && (
-        <button
-          onClick={() => handleStatusChange("reading")}
-          disabled={submitting}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium border border-border rounded-md text-foreground hover:bg-gray-50 transition-colors disabled:opacity-50"
-        >
-          <Play className="w-4 h-4" />
-          {submitting ? "Updating..." : "Resume Reading"}
-        </button>
+        <>
+          <button
+            onClick={() => handleStatusChange("reading")}
+            disabled={submitting}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium border border-border rounded-md text-foreground hover:bg-gray-50 transition-colors disabled:opacity-50"
+          >
+            <Play className="w-4 h-4" />
+            {submitting ? "Updating..." : "Resume Reading"}
+          </button>
+          <button
+            onClick={() => handleStatusChange("abandoned")}
+            disabled={submitting}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-muted hover:text-red-600 transition-colors disabled:opacity-50"
+          >
+            <XCircle className="w-4 h-4" />
+            Abandon
+          </button>
+        </>
       )}
 
       {status === "abandoned" && (
