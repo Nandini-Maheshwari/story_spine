@@ -1,7 +1,7 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
+import BookCover from "@/components/BookCover"
 import { Star } from "lucide-react"
 import type { GoogleSearchResult } from "@/lib/google"
 
@@ -35,20 +35,15 @@ export default function SearchResultsGrid({ results, query }: SearchResultsGridP
             className="group"
           >
             <div className="relative aspect-2/3 mb-2.5 rounded overflow-hidden border border-border bg-gray-50">
-              {book.cover_url ? (
-                <Image
-                  src={book.cover_url}
-                  alt={`Cover of ${book.title}`}
-                  fill
-                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
-                  className="object-cover group-hover:scale-[1.02] transition-transform duration-200"
-                  unoptimized
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-muted text-xs">
-                  No cover
-                </div>
-              )}
+              <BookCover
+                src={book.cover_url}
+                alt={`Cover of ${book.title}`}
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                className="object-cover group-hover:scale-[1.02] transition-transform duration-200"
+                placeholderClassName="w-full h-full flex items-center justify-center text-muted text-xs"
+                placeholderText="No cover"
+              />
             </div>
 
             <h3 className="text-sm font-medium text-foreground leading-tight line-clamp-2 group-hover:text-accent transition-colors">

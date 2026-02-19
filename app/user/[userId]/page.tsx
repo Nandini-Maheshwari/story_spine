@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { User, Heart, BookOpen } from "lucide-react";
+import BookCover from "@/components/BookCover";
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { getUserProfilePage } from "@/lib/services/profile";
 import type { Book } from "@/types/book";
@@ -64,20 +65,15 @@ function BookShelf({
             href={`/books/${book.google_book_id}`}
             className="shrink-0 w-[120px] group"
           >
-            {book.cover_url ? (
-              <Image
-                src={book.cover_url}
-                alt={`Cover of ${book.title}`}
-                width={120}
-                height={180}
-                className="rounded-md shadow-sm border border-border"
-                unoptimized
-              />
-            ) : (
-              <div className="w-[120px] h-[180px] rounded-md border border-border bg-gray-50 flex items-center justify-center">
-                <BookOpen className="w-8 h-8 text-muted" />
-              </div>
-            )}
+            <BookCover
+              src={book.cover_url}
+              alt={`Cover of ${book.title}`}
+              width={120}
+              height={180}
+              className="rounded-md shadow-sm border border-border"
+              placeholderClassName="w-[120px] h-[180px] rounded-md border border-border bg-gray-50 flex items-center justify-center"
+              placeholderIconClassName="w-8 h-8 text-muted"
+            />
             <p className="mt-1.5 text-xs text-foreground line-clamp-2 group-hover:text-accent transition-colors">
               {book.title}
             </p>
