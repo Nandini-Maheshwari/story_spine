@@ -1,4 +1,4 @@
-import Image from "next/image";
+import BookCover from "@/components/BookCover";
 import type { Book } from "@/types/book";
 
 interface BookHeaderProps {
@@ -10,13 +10,12 @@ export default function BookHeader({ book }: BookHeaderProps) {
     <section className="flex gap-8">
       {book.cover_url && (
         <div className="shrink-0">
-          <Image
+          <BookCover
             src={book.cover_url}
             alt={`Cover of ${book.title}`}
             width={180}
             height={270}
             className="rounded-md shadow-sm border border-border"
-            unoptimized
           />
         </div>
       )}

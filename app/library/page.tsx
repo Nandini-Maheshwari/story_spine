@@ -27,16 +27,21 @@ export default async function LibraryPage({ searchParams }: LibraryPageProps) {
   const params = await searchParams;
   const supabase = await createSupabaseServerClient();
 
+  const { data: { user } } = await supabase.auth.getUser();
+
   let books: LibraryBook[] = [];
   try {
-    books = await getUserLibrary(
-      supabase,
-      params.status,
-      params.year ? Number(params.year) : undefined,
-      params.genre,
-      PAGE_SIZE,
-      Number(params.offset || 0)
-    );
+    if (user) {
+      books = await getUserLibrary(
+        supabase,
+        user.id,
+        params.status,
+        params.year ? Number(params.year) : undefined,
+        params.genre,
+        PAGE_SIZE,
+        Number(params.offset || 0)
+      );
+    }
   } catch {
     // Unauthorized or error — show empty
   }

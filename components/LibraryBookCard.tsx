@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import BookCover from "@/components/BookCover";
 import type { LibraryBook } from "@/types/book";
 import { STATUS_STYLES, STATUS_LABELS } from "@/lib/constants";
 
@@ -9,18 +9,14 @@ export default function LibraryBookCard({ book }: { book: LibraryBook }) {
       href={`/books/${book.google_book_id}`}
       className="flex gap-4 border border-border rounded-md p-4 hover:shadow-sm transition-shadow"
     >
-      {book.cover_url ? (
-        <Image
-          src={book.cover_url}
-          alt={`Cover of ${book.title}`}
-          width={80}
-          height={120}
-          className="rounded shrink-0 border border-border object-cover"
-          unoptimized
-        />
-      ) : (
-        <div className="w-[80px] h-[120px] rounded shrink-0 bg-gray-100 border border-border" />
-      )}
+      <BookCover
+        src={book.cover_url}
+        alt={`Cover of ${book.title}`}
+        width={80}
+        height={120}
+        className="rounded shrink-0 border border-border object-cover"
+        placeholderClassName="w-[80px] h-[120px] rounded shrink-0 bg-gray-100 border border-border"
+      />
 
       <div className="flex flex-col gap-2 min-w-0">
         <h3 className="font-semibold text-foreground leading-tight truncate">

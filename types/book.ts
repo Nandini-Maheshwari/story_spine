@@ -30,6 +30,8 @@ export interface Review {
   avatar_url: string | null;
   deleted_at: string | null;
   is_own_review: boolean;
+  is_private: boolean;
+  reviewer_is_following?: boolean;
   user_overall: number | null;
   user_character: number | null;
   user_pacing: number | null;

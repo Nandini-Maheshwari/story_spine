@@ -17,6 +17,17 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
+
     setLoading(true);
 
     const { error } = await supabase.auth.signInWithPassword({
