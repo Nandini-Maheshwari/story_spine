@@ -16,7 +16,7 @@ export async function GET(req: Request) {
   const limit = Number(searchParams.get("limit") || 20)
   const offset = Number(searchParams.get("offset") || 0)
 
-  const data = await getUserLibrary(supabase, status, year, genre, limit, offset)
+  const data = await getUserLibrary(supabase, user.id, status, year, genre, limit, offset)
   return Response.json(data)
 }
 
