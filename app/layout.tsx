@@ -17,6 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "StorySpine",
   description: "Discover stories. Share what you read.",
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({
