@@ -14,6 +14,7 @@ interface EditProfileFormProps {
   bio: string | null;
   avatarUrl: string | null;
   currentGenreNames: string[];
+  isPrivate: boolean;
 }
 
 export default function EditProfileForm({
@@ -21,6 +22,7 @@ export default function EditProfileForm({
   bio,
   avatarUrl,
   currentGenreNames,
+  isPrivate,
 }: EditProfileFormProps) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -29,6 +31,7 @@ export default function EditProfileForm({
     bio: bio ?? "",
     avatarUrl: avatarUrl ?? "",
   });
+  const [privateProfile, setPrivateProfile] = useState(isPrivate);
   const [status, setStatus] = useState<
     "idle" | "submitting" | "error"
   >("idle");
@@ -88,7 +91,7 @@ export default function EditProfileForm({
     setErrorMessage("");
 
     try {
-      const [profileRes, genresRes] = await Promise.all([
+      const requests: Promise<Response>[] = [
         fetch("/api/profile", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
@@ -105,9 +108,22 @@ export default function EditProfileForm({
             genreIds: Array.from(selectedGenreIds),
           }),
         }),
-      ]);
+      ];
 
-      if (profileRes.status === 401 || genresRes.status === 401) {
+      if (privateProfile !== isPrivate) {
+        requests.push(
+          fetch("/api/social/privacy", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ isPrivate: privateProfile }),
+          })
+        );
+      }
+
+      const results = await Promise.all(requests);
+      const [profileRes, genresRes] = results;
+
+      if (results.some((r) => r.status === 401)) {
         setErrorMessage("You must be logged in to edit your profile.");
         setStatus("error");
         return;
@@ -206,6 +222,20 @@ export default function EditProfileForm({
         </div>
       )}
 
+      {/* Privacy */}
+      <div className="flex items-center gap-2.5">
+        <input
+          id="privateProfile"
+          type="checkbox"
+          checked={privateProfile}
+          onChange={(e) => setPrivateProfile(e.target.checked)}
+          className="w-4 h-4 rounded border-border accent-accent cursor-pointer"
+        />
+        <label htmlFor="privateProfile" className="text-sm text-foreground cursor-pointer">
+          Private profile
+        </label>
+      </div>
+
       {status === "error" && (
         <p className="text-sm text-red-600">{errorMessage}</p>
       )}
@@ -229,6 +259,7 @@ export default function EditProfileForm({
               bio: bio ?? "",
               avatarUrl: avatarUrl ?? "",
             });
+            setPrivateProfile(isPrivate);
             setGenresLoaded(false);
           }}
           className="text-sm text-muted hover:text-foreground transition-colors"
