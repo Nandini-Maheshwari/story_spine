@@ -3,6 +3,7 @@ import { fetchGoogleBookById } from "@/lib/google"
 
 export async function getUserLibrary(
   supabase: SupabaseClient,
+  userId: string,
   status?: string,
   year?: number,
   genre?: string,
@@ -10,6 +11,7 @@ export async function getUserLibrary(
   offset = 0
 ) {
   const { data, error } = await supabase.rpc("get_user_library", {
+    p_user_id: userId,
     p_status: status ?? null,
     p_year: year ?? null,
     p_genre: genre ?? null,
