@@ -10,6 +10,15 @@ export interface UserProfile {
   following_count: number;
   books_read_count: number;
   deleted_at: string | null;
+  is_private: boolean;
+  is_following: boolean;
+}
+
+export interface SocialUser {
+  id: string;
+  username: string;
+  display_name: string | null;
+  avatar_url: string | null;
 }
 
 export interface ProfileReview {
