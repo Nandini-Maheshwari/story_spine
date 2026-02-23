@@ -2,6 +2,7 @@
 
 import { AlertTriangle } from "lucide-react";
 import LikeButton from "@/components/LikeButton";
+import FollowButton from "@/components/FollowButton";
 import type { Review } from "@/types/book";
 
 interface ReviewCardProps {
@@ -10,10 +11,12 @@ interface ReviewCardProps {
 
 export default function ReviewCard({ review }: ReviewCardProps) {
   const isDeleted = review.deleted_at !== null;
+  const isAnonymous = !review.is_own_review && review.is_private === true;
 
-  const displayName = isDeleted
-    ? "Anonymous reader"
-    : review.display_name || review.username;
+  const displayName =
+    isDeleted || isAnonymous
+      ? "Anonymous reader"
+      : review.display_name || review.username;
 
   const formattedDate = new Date(review.created_at).toLocaleDateString(
     "en-US",
@@ -31,6 +34,14 @@ export default function ReviewCard({ review }: ReviewCardProps) {
             <span className="px-1.5 py-0.5 text-xs font-medium text-accent bg-accent/10 rounded">
               Your review
             </span>
+          )}
+          {!isDeleted && !isAnonymous && !review.is_own_review && (
+            <FollowButton
+              targetUserId={review.user_id}
+              initialIsFollowing={review.reviewer_is_following ?? false}
+              compact
+              skipRefresh
+            />
           )}
         </div>
         <span className="text-xs text-muted">{formattedDate}</span>
